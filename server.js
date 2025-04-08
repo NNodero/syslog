@@ -6,15 +6,15 @@ const PORT = 514; // Standard syslog port
 const HOST = '0.0.0.0'; // Listen on all interfaces
 
 server.on('message', (msg, rinfo) => {
-  const log = msg.toString();
+  const log = msg.toString().trim();
   const timestamp = new Date().toISOString();
-  const entry = `[${timestamp}] ${log}\n`;
+  const entry = `[${timestamp}] (${rinfo.address}:${rinfo.port}) ${log}\n`;
 
-  console.log(`Received log from ${rinfo.address}:${rinfo.port}`);
   console.log(entry);
 
-  // Append to a local file (optional: later you can use DB instead)
-  fs.appendFile('logs.txt', log + '\n')
+  fs.appendFile('logs.txt', entry, (err) => {
+    if (err) console.error('Error writing to log file:', err);
+  });
 });
 
 server.bind(PORT, HOST, () => {
