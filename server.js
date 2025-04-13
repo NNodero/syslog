@@ -1,7 +1,7 @@
-const dgram = require('dgram');
-const fs = require('fs');
+import {createSocket} from 'dgram'
+import fs from 'fs/promises'
 
-const server = dgram.createSocket('udp4');
+const server = createSocket('udp4');
 
 const PORT = 514; // Standard syslog port
 const HOST = '0.0.0.0'; // Listen on all interfaces
