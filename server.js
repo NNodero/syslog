@@ -1,18 +1,30 @@
 const dgram = require('dgram');
 const fs = require('fs');
+
 const server = dgram.createSocket('udp4');
 
 const PORT = 514; // Standard syslog port
 const HOST = '0.0.0.0'; // Listen on all interfaces
 
+const regex = /(\w+)=("(?:[^"\\]|\\.)*"|\S+)/g;
+
 server.on('message', (msg, rinfo) => {
-  const log = msg.toString().trim();
-  const timestamp = new Date().toISOString();
-  const entry = `[${timestamp}] (${rinfo.address}:${rinfo.port}) ${log}\n`;
+  const entry = `${msg}\n`;
+  const matches = [...entry.matchAll(regex)]; // Get all matches
+  const logObject = {};
 
-  console.log(entry);
+  // Convert matches to key-value pairs
+  for (const match of matches) {
+    const [, key, value] = match;
+    logObject[key] = value.replace(/^"|"$/g, ''); // Remove quotes from values
+  }
 
-  fs.appendFile('logs.txt', entry, (err) => {
+  // Convert to JSON string
+  const logJson = JSON.stringify(logObject) + '\n';
+
+  console.log(logObject);
+
+  fs.appendFile('logs.json', logJson, (err) => {
     if (err) console.error('Error writing to log file:', err);
   });
 });
