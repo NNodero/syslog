@@ -20,7 +20,7 @@ export const syslogserver =()=>{
           //File name to save
     const gethourlyfilename = ()=>{      
        const time= new Date();
-       time.setSeconds(0, 0);  // resets seconds and milliseconds
+       time.setMinutes(0, 0, 0);  // resets seconds and milliseconds
        const timestamp = time.getTime();
        return `${timestamp}-logs.json`;
         
@@ -49,7 +49,6 @@ export const syslogserver =()=>{
             });
             
     });
-    
     
 
     server.bind(PORT, HOST, () => {
